@@ -1,8 +1,8 @@
-name: Build and Save Firmware
+name: Build and Release Firmware
 
 on:
   push:
-    branches: [ main ]  # mainブランチにpushされた時のみ実行
+    branches: [ main ]
 
 jobs:
   build:
@@ -10,13 +10,14 @@ jobs:
 
     strategy:
       matrix:
-        board: [esp32s3usbotg] # 複数ボードに対応可能
+        board: [esp32s3usbotg]  # 複数ボード対応可
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.MY_PAT }}  # ← ここで token を明示
+          token: ${{ secrets.MY_PAT }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -36,18 +37,38 @@ jobs:
           echo "Build date: $(date)" > firmware/${{ matrix.board }}/info.txt
           echo "Source commit: $GITHUB_SHA" >> firmware/${{ matrix.board }}/info.txt
 
+      # --- firmware-buildsブランチにpush ---
       - name: Push firmware to firmware-builds branch
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
 
+          git fetch origin
           git checkout -B firmware-builds
 
-          # firmwareフォルダ以外を削除
-          find . -mindepth 1 -maxdepth 1 ! -name '.git' ! -name 'firmware' -exec rm -rf {} +
+          for item in * .*; do
+            if [ "$item" != "." ] && [ "$item" != ".." ] && [ "$item" != ".git" ] && [ "$item" != "firmware" ]; then
+              rm -rf "$item"
+            fi
+          done
 
-          git add firmware
+          git add -A
           git commit -m "Add firmware for ${{ matrix.board }} from commit $GITHUB_SHA" || echo "No changes to commit"
           git push https://x-access-token:${{ secrets.MY_PAT }}@github.com/${{ github.repository }} firmware-builds --force
+
+      # --- GitHub Releaseを作成＆アップロード ---
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: "Firmware Build ${{ github.run_number }}"
+          body: |
+            Automated build for board: **${{ matrix.board }}**
+            Commit: ${{ github.sha }}
+            Build number: ${{ github.run_number }}
+          files: |
+            firmware/${{ matrix.board }}/firmware.bin
+            firmware/${{ matrix.board }}/info.txt
         env:
           GITHUB_TOKEN: ${{ secrets.MY_PAT }}
