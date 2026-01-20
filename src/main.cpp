@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <USB.h>
 #include <USBHIDGamepad.h>
 
