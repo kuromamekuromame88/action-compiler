@@ -41,7 +41,7 @@ void setup() {
 }
 
 void loop() {
-  if (bleGamepad.isConnected())
+  if (BG.isConnected())
     {
         /*
         bleGamepad.press(BUTTON_5);
@@ -61,7 +61,7 @@ void loop() {
         //bleGamepad.setHIDAxes(0, 0, 0, 0, 0, 0, 0, 0);      //(X, Y, Z, RZ, RX, RY)
         delay(500);
         */
-        bleGamepad.setAxes(readAxe(LX), 32767, 32767, 32767, 32767, 32767, 32767, 32767);       //(X, Y, Z, RX, RY, RZ)
+        BG.setAxes(readAxe(LX), 32767, 32767, 32767, 32767, 32767, 32767, 32767);       //(X, Y, Z, RX, RY, RZ)
         delay(5);
     }
 }
