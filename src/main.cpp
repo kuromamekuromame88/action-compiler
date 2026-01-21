@@ -33,7 +33,7 @@ BleGamepad BG;
 #define BTN_Y 6
 
 int16_t readAxe(int pin){
-  return map(analogRead(pin), 0, 4095, -32768, 32767);
+  return map(analogRead(pin), 0, 4095, 0, 32767);
 }
 
 void setup() {
