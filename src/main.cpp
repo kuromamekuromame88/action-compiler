@@ -61,7 +61,7 @@ void loop() {
         //bleGamepad.setHIDAxes(0, 0, 0, 0, 0, 0, 0, 0);      //(X, Y, Z, RZ, RX, RY)
         delay(500);
         */
-        BG.setAxes(readAxe(LX), 32767, 32767, 32767, 32767, 32767, 32767, 32767);       //(X, Y, Z, RX, RY, RZ)
+        BG.setAxes(readAxe(LX), readAxe(LY), readAxe(RX), readAxe(RY), 32767, 32767, 32767, 32767);       //(X, Y, Z, RX, RY, RZ)
         delay(5);
     }
 }
