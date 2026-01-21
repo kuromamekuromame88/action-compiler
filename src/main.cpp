@@ -62,7 +62,7 @@ void loop() {
         delay(500);
         */
         BG.setAxes(readAxe(LX), readAxe(LY), readAxe(RX), readAxe(RY), 32767, 32767, 32767, 32767);       //(X, Y, Z, RX, RY, RZ)
-        BG.setHats(digitalRead(UP), digitalRead(DOWN), digitalRead(RIGHT), digitalRead(LEFT));
+        BG.setHats(!digitalRead(UP), !digitalRead(DOWN), !digitalRead(RIGHT), !digitalRead(LEFT));
         delay(5);
     }
 }
