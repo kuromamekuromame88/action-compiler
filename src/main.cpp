@@ -1,7 +1,8 @@
 #include <Arduino.h>
-#include <BleGamepad.h>
 
-BleGamepad BG("ESP32Pad", "Taisei", 100, false);
+#include "USB.h"
+#include "USBHIDGamepad.h"
+USBHIDGamepad Gamepad;
 
 // ===== ピン定義 =====
 #define MStart1 42
@@ -37,32 +38,19 @@ int16_t readAxe(int pin){
 }
 
 void setup() {
-  BG.begin();
+  int pins[] = {
+    MStart1, LB, RB,
+    UP, RIGHT, DOWN, LEFT,
+    ZL, ZR, L, R,
+    PLUS, MINUS,
+    BTN_A, BTN_B, BTN_X, BTN_Y
+  };
+  for(int p : pins) pinMode(p, INPUT_PULLUP);
+
+  Gamepad.begin();
+  USB.begin();
 }
 
 void loop() {
-  if (BG.isConnected())
-    {
-        /*
-        bleGamepad.press(BUTTON_5);
-        bleGamepad.press(BUTTON_16);
-        bleGamepad.pressStart();
-        bleGamepad.setAxes(readAxe(LX), 32767, 32767, 32767, 32767, 32767, 32767, 32767);       //(X, Y, Z, RX, RY, RZ)
-        //bleGamepad.setHIDAxes(32767, 32767, 32767, 32767, 32767, 32767, 32767, 32767);  //(X, Y, Z, RZ, RX, RY)
-        bleGamepad.setHat1(HAT_DOWN_RIGHT);
-        // All axes, sliders, hats etc can also be set independently. See the IndividualAxes.ino example
-        delay(500);
-
-        Serial.println("Release button 5 and start. Move all axes to min. Set DPAD (hat 1) to centred.");
-        bleGamepad.release(BUTTON_5);
-        bleGamepad.releaseStart();
-        bleGamepad.setHat1(HAT_CENTERED);
-        bleGamepad.setAxes(0, 0, 0, 0, 0, 0, 0, 0);           //(X, Y, Z, RX, RY, RZ)
-        //bleGamepad.setHIDAxes(0, 0, 0, 0, 0, 0, 0, 0);      //(X, Y, Z, RZ, RX, RY)
-        delay(500);
-        */
-        BG.setAxes(readAxe(LX), readAxe(LY), readAxe(RX), readAxe(RY), 32767, 32767, 32767, 32767);       //(X, Y, Z, RX, RY, RZ)
-        BG.setHats(!digitalRead(UP), !digitalRead(DOWN), !digitalRead(RIGHT), !digitalRead(LEFT));
-        delay(5);
-    }
+  Gamepad.leftStick(readAxe(LX), readAxe(LY));
 }
